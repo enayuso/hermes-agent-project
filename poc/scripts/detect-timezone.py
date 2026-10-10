@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Set the agent's IANA timezone from its owner or an explicit override.
 
-This host setup step works on macOS, Linux, and Windows. For IANA validation on
-Windows, install Python's tzdata package. No country or language is assumed.
+Host setup step, run on macOS. No country or language is assumed.
 """
 
 from __future__ import annotations

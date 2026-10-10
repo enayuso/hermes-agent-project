@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Portable foreground launcher for the restricted host broker.
 
-Requires Docker CLI access on this host. On Windows, provision an ACL-protected
-token file first; POSIX hosts can generate one with owner-only permissions.
+Requires Docker CLI access on this host (macOS: Docker Desktop or Colima). The
+token file is generated with owner-only permissions.
 """
 
 from __future__ import annotations

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# POSIX convenience wrapper; the Python entry point also runs on Windows.
+# Shell wrapper around scripts/start-sandbox-broker.py (macOS).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export PYTHONDONTWRITEBYTECODE=1

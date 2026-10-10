@@ -45,7 +45,7 @@ poc/
 
 ### 준비물
 
-- Docker(Windows는 Linux 컨테이너 모드의 Docker Desktop)와 Python 3
+- macOS(Apple Silicon)와 Docker Desktop 또는 Colima(`brew install colima docker && colima start`), Python 3
 - 툴 호출을 지원하는 OpenAI 호환 모델 엔드포인트(vLLM + Qwen으로 테스트, `poc/config/config.yaml`에서 설정)
 - Socket Mode Slack 앱 — `poc/config/slack-manifest.json`으로 생성
 
@@ -53,7 +53,6 @@ poc/
 
 ```bash
 cd poc
-python3 -m pip install -r requirements-host.txt
 python3 scripts/init.py   # data/와 .env 생성 (API 키 생성, 시간대 감지)
 # .env에 SLACK_BOT_TOKEN, SLACK_APP_TOKEN, SLACK_ALLOWED_USERS 등 입력
 docker compose up -d

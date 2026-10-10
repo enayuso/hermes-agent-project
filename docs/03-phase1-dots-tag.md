@@ -46,10 +46,10 @@ Researched 2026-10-07 from first-party docs: OpenAI's [Meet dots](https://learn.
 - **No spend limits** yet (a self-hosted model, so cost is GPU time, not money).
 - **No "take over the browser"** handoff.
 
-## Platforms (Mac and Windows)
-The agent runs server-side in its container, so coworkers on macOS or Windows reach it the same way: through Slack (desktop, web, mobile). The Outlook connector also runs server-side, so nothing is installed on anyone's machine. Only relevant later:
+## Platforms
+The agent runs server-side in its container (hosted on a Mac for this PoC), so people reach it the same way from any device: through Slack (desktop, web, mobile). The Outlook connector also runs server-side, so nothing is installed on anyone's machine. Only relevant later:
 - Dots-style "access my computer" would need a desktop client; Hermes' desktop app has macOS and Windows installers and can connect to a remote gateway (Phase 3 decision).
-- The PoC's helper scripts are bash: on Windows they need WSL or Git Bash if a coworker runs the PoC themselves.
+- The PoC's helper scripts are bash and are run on macOS.
 
 ## Outlook: why ms-365-mcp-server
 - Microsoft's own Outlook MCP servers (Work IQ Mail/Calendar) require a Microsoft 365 Copilot license and are in preview.

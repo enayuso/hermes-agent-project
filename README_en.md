@@ -46,7 +46,7 @@ poc/
 
 ### Prerequisites
 
-- Docker (on Windows: Docker Desktop with Linux containers) and Python 3
+- macOS (Apple Silicon) with Docker Desktop or Colima (`brew install colima docker && colima start`) and Python 3
 - An OpenAI-compatible model endpoint with tool calling (tested with vLLM serving Qwen; set it in
   `poc/config/config.yaml`)
 - A Slack app in Socket Mode — create it from `poc/config/slack-manifest.json`
@@ -55,7 +55,6 @@ poc/
 
 ```bash
 cd poc
-python3 -m pip install -r requirements-host.txt
 python3 scripts/init.py   # creates data/ and .env (generates the API key, detects timezone)
 # fill SLACK_BOT_TOKEN, SLACK_APP_TOKEN, SLACK_ALLOWED_USERS, ... in .env
 docker compose up -d
