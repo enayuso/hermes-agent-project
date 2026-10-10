@@ -1,0 +1,3 @@
+name: pilot-sandbox
+version: 0.1.0
+description: Restricted broker-backed terminal environment for Pilot Agent.

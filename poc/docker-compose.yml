@@ -1,0 +1,30 @@
+# Pilot Agent PoC — one Hermes Agent container = one user's agent.
+#
+# Usage:
+#   ./scripts/init.sh          # first time: creates data/ and .env
+#   docker compose up -d
+#   ./scripts/smoke-test.sh
+#
+# Hermes is a single-tenant agent (see its SECURITY.md §2): the container is the
+# security boundary, so a multi-user deployment runs one of these per user.
+
+services:
+  agent:
+    image: nousresearch/hermes-agent:v2026.9.24   # pinned stable release
+    container_name: pilot-agent
+    restart: unless-stopped
+    volumes:
+      - ./data:/opt/data
+    ports:
+      - "127.0.0.1:8642:8642"                     # OpenAI-compatible API (product integration point)
+      - "127.0.0.1:9119:9119"                     # web dashboard (sessions, logs, cron, usage)
+    env_file:
+      - .env
+    environment:
+      - HERMES_UID=${HERMES_UID:-10000}
+      - HERMES_GID=${HERMES_GID:-10000}
+      - API_SERVER_ENABLED=true
+      - API_SERVER_HOST=0.0.0.0                   # inside the container; published to host loopback only
+      - HERMES_DASHBOARD=1                        # login from HERMES_DASHBOARD_BASIC_AUTH_* in .env
+      # TZ / HERMES_TIMEZONE come from .env (scripts/detect-timezone.sh: owner's Slack profile)
+    command: ["gateway", "run"]

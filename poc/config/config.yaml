@@ -1,0 +1,104 @@
+# Pilot Agent PoC — Hermes Agent profile config.
+# Copied into poc/data/config.yaml by scripts/init.sh on first run; edit there
+# afterwards (the data dir is the agent's live state and is gitignored).
+
+model:
+  provider: "custom"                                 # any OpenAI-compatible endpoint (vLLM)
+  base_url: "http://203.0.113.20:11434/v1"         # self-hosted vLLM
+  default: "Inferact/Qwen3.8-Flash-Next-NVFP4"
+  context_length: 262144                             # matches vLLM max_model_len
+  # Fallback used 2026-10-07 while vLLM was down: Furiosa NPU server
+  # base_url "http://203.0.113.30:11551/v1", default "furiosa-ai/gpt-oss-20b", context_length 131072.
+  # gpt-oss-20b was noticeably weaker (often called hidden tools directly; ~50% failed Slack reads).
+
+terminal:
+  # The whole agent already runs inside its own container ("its own computer"),
+  # so "local" here means commands execute inside that container, not on the host.
+  backend: "local"
+  cwd: "/opt/data/workspace"
+  timeout: 180
+
+approvals:
+  # Always ask in chat before dangerous commands (Dots / Claude Tag "ask first").
+  # Default "smart" lets an auxiliary LLM decide, which may skip the prompt.
+  mode: manual
+  timeout: 300        # no answer within 5 min = command is NOT run
+  cron_mode: deny     # unattended runs never execute dangerous commands
+  unattended_mode: deny
+
+plugins:
+  enabled:
+    - pilot-rules    # Allow / Ask / Block on every tool call — rules in pilot-rules.yaml
+    - pilot-slack-read  # read-only Slack history, threads, pins (Claude Tag baseline)
+    - pilot-slack-controls  # thread mute, feedback, and channel automatic reply setting
+    - pilot-routines  # channel/DM-scoped routine listing and management
+    - pilot-usage  # per-request token audit by verified place; no prompts or dollar estimate
+
+mcp_servers:
+  # Outlook mail + calendar + contacts via Microsoft Graph (Softeria ms-365-mcp-server, MIT).
+  # Tools register as mcp_outlook_<tool>; pilot-rules.yaml decides allow / ask / block.
+  # Sign in once with scripts/outlook-login.sh (device code); the token cache lives in data/.
+  outlook:
+    # Halted 2026-10-07 until the Outlook sign-in is approved; set true to turn it back on.
+    enabled: false
+    command: npx
+    args: ["-y", "@softeria/ms-365-mcp-server@0.159.1", "--org-mode", "--preset", "outlook"]
+    env:
+      MS365_MCP_TOKEN_CACHE_PATH: /opt/data/connectors/outlook/.token-cache.json
+      MS365_MCP_SELECTED_ACCOUNT_PATH: /opt/data/connectors/outlook/.selected-account.json
+      MS365_MCP_USE_KEYTAR: "0"
+
+# Claude Tag-style channel behaviour.
+# The default profile is the channel/group-DM service identity. Personal one-to-one DMs
+# route to separately provisioned Hermes profiles. scripts/provision-personal-dms.py
+# writes the deployment-specific profile_routes into data/config.yaml after it confirms
+# each allowed user's DM chat ID; keep IDs out of this reusable template.
+gateway:
+  multiplex_profiles: true
+profile_routes: []
+
+# One shared session per thread: anyone in the thread can steer the work (default is per-user).
+group_sessions_per_user: false
+slack:
+  # Hermes keeps its mention gate; pilot-slack-controls opens it for channels
+  # whose per-channel Respond automatically setting is on. Joined threads continue.
+  require_mention: true
+  # Stay out of messages that open by addressing someone else.
+  ignore_other_user_mentions: true
+
+# Timezone: not set here. scripts/detect-timezone.sh writes HERMES_TIMEZONE (and TZ) into .env
+# from the owner's Slack profile; HERMES_TIMEZONE takes precedence over a `timezone:` key.
+
+tools:
+  tool_search:
+    # Off: every tool is directly callable. With it on, plugin/MCP tools must be called through
+    # the tool_call bridge, and gpt-oss-20b often called them directly instead ("Tool ... does not
+    # exist"), failing ~half of Slack reads. Revisit when Outlook (96 tools) is re-enabled: filter
+    # its tools with mcp_servers.outlook.tools.include, or turn this back on with a stronger model.
+    enabled: "off"
+
+platforms:
+  slack:
+    extra:
+      # The persistent per-channel setting lives in pilot-slack-controls. The
+      # pilot test channel starts off; newly joined channels start on like Tag.
+      # Claude Tag: replies carry 👍/👎 feedback buttons; 👎 mutes the thread (pilot-slack-controls).
+      # Hermes only adds the buttons to Block Kit replies, hence rich_blocks.
+      rich_blocks: true
+      feedback_buttons: true
+
+memory:
+  # Claude Tag-style memory per place (pilot-memory provider): notes per channel / group DM / DM,
+  # workspace notes saved from public channels. Hermes' built-in MEMORY.md / USER.md is one
+  # notebook injected into every conversation, so it is turned off to keep places isolated.
+  provider: pilot-memory
+  memory_enabled: false
+  user_profile_enabled: false
+
+agent:
+  disabled_toolsets:
+    # Unscoped search over every person's past conversations; past_sessions (pilot-memory)
+    # replaces it with this place's conversations only. Hidden so the model doesn't try it
+    # (pilot-rules.yaml also blocks it as a backstop). Keep the `memory` toolset enabled:
+    # Hermes only exposes memory-provider tools when it is.
+    - session_search

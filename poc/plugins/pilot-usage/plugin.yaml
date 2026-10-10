@@ -1,0 +1,3 @@
+name: pilot-usage
+version: "0.1"
+description: Record per-model-request token usage by verified Pilot profile and conversation

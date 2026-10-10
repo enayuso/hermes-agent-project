@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "hosts": [
+    "search.parallel.ai",
+    "github.com",
+    "api.github.com",
+    "raw.githubusercontent.com"
+  ]
+}

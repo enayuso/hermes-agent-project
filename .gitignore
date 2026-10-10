@@ -1,0 +1,6 @@
+poc/data/
+poc/.env
+poc/.sandbox-broker-token
+.DS_Store
+__pycache__/
+*.pyc

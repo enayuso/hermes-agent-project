@@ -1,0 +1,48 @@
+# Pilot Agent rules — what the agent may do on its own (OpenAI Dots "Custom Rules").
+# Copied to poc/data/pilot-rules.yaml by scripts/init.sh; edits there apply without a restart.
+#
+#   allow  run without asking
+#   ask    pause and ask the user in chat (Approve / Deny buttons); never runs unattended
+#   block  never run
+#
+# Patterns are tool names with shell-style globs. Precedence: block > allow > ask > default.
+# A whole connector sits on "ask" and only listed read-only/draft tools are allowed, so any
+# tool the connector adds later asks first by default.
+# Outlook tools come from the "outlook" MCP server as mcp_outlook_<tool>.
+# Shell commands are additionally covered by Hermes' own dangerous-command approvals.
+
+default: allow
+
+ask:
+  # Self-written skills are shared by every channel and DM, so a skill distilled from one
+  # place could carry its details elsewhere. Claude Tag puts skill changes through human
+  # review (pull requests on its skills repo); here a person approves each change.
+  - skill_manage
+  - mcp_outlook_*
+
+allow:
+  # Reading mail, calendar, contacts, files.
+  - mcp_outlook_list_*
+  - mcp_outlook_get_*
+  - mcp_outlook_search_*
+  # Read-only despite using POST under the hood.
+  - mcp_outlook_verify_login
+  - mcp_outlook_find_meeting_times
+  - mcp_outlook_download_bytes*
+  # Drafts send nothing; sending a draft is send_draft_message, which still asks.
+  - mcp_outlook_create_draft_email
+  - mcp_outlook_create_*_draft
+
+block:
+  # Built-in search over every past conversation of every person, unscoped. Replaced by
+  # past_sessions (pilot-memory), which only sees the current place's conversations.
+  - session_search
+  # Irreversible or standing changes are left to the user.
+  - mcp_outlook_delete_*
+  - mcp_outlook_create_mail_rule
+  - mcp_outlook_update_mail_rule
+  # Granting others access to the user's calendar.
+  - mcp_outlook_*_my_calendar_permission
+  # The agent never signs itself out of the user's account.
+  - mcp_outlook_logout
+  - mcp_outlook_remove_account

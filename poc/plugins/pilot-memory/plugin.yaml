@@ -1,0 +1,5 @@
+name: pilot-memory
+version: 0.1.0
+description: "Claude Tag-style scoped memory: notes per channel / group DM / DM, workspace notes from public channels, past sessions per place."
+hooks:
+  - on_turn_start

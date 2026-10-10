@@ -1,0 +1,81 @@
+# Candidate policy for the disposable-worker cutover. Not active in config.yaml.
+# Evaluate with scripts/check-boundary-tools.py inside pinned Hermes before applying.
+version: 1
+enabled_plugins:
+  - pilot-rules
+  - pilot-slack-read
+  - pilot-slack-controls
+  - pilot-routines
+  - pilot-usage
+  - pilot-sandbox
+platform_toolsets:
+  slack: [terminal, file, memory, clarify, todo, cronjob, pilot-routines, pilot-slack-controls, pilot_slack_read, pilot-egress]
+  cron: [terminal, file, memory, todo, pilot-routines, pilot_slack_read, pilot-egress]
+  api_server: []
+# Hermes auto-enables a newly discovered plugin toolset even with an explicit
+# empty platform list. Mark the current catalog as known on every platform;
+# the preflight still rejects a later, unreviewed addition.
+known_plugin_toolsets:
+  slack: [a2a, pilot-egress, pilot-routines, pilot-slack-controls, pilot_slack_read, spotify]
+  cron: [a2a, pilot-egress, pilot-routines, pilot-slack-controls, pilot_slack_read, spotify]
+  api_server: [a2a, pilot-egress, pilot-routines, pilot-slack-controls, pilot_slack_read, spotify]
+disabled_toolsets:
+  - session_search
+  - browser
+  - code_execution
+  - web
+  - skills
+  - project
+  - delegation
+  - connections
+  - computer_use
+  - desktop_ui
+  - vision
+  - video
+  - tts
+  - image_gen
+  - video_gen
+allowed_tools:
+  slack:
+    - clarify
+    - channel_response_setting
+    - cronjob
+    - cronjob_manage
+    - memory_notes
+    - patch
+    - past_sessions
+    - process_manage
+    - read_file
+    - routines_list
+    - search_files
+    - slack_list_channels
+    - slack_list_pins
+    - slack_read_channel
+    - slack_read_thread
+    - terminal
+    - todo_list
+    - web_fetch
+    - public_web_search
+    - write_file
+  cron:
+    - patch
+    - memory_notes
+    - past_sessions
+    - process_manage
+    - read_file
+    - routines_list
+    - search_files
+    - slack_list_channels
+    - slack_list_pins
+    - slack_read_channel
+    - slack_read_thread
+    - terminal
+    - todo_list
+    - web_fetch
+    - public_web_search
+    - write_file
+  api_server: []
+required_tools:
+  slack: [terminal, read_file, write_file, routines_list, slack_read_thread, web_fetch, public_web_search, memory_notes, past_sessions]
+  cron: [terminal, read_file, write_file, web_fetch, public_web_search, memory_notes, past_sessions]
+  api_server: []

@@ -1,0 +1,14 @@
+# Opt-in only after docs/07-phase2-boundaries.md cutover checks are complete.
+# Start the host broker first. The versioned egress policy defaults to deny all.
+services:
+  agent:
+    volumes:
+      - ./.sandbox-broker-token:/run/pilot-broker-token:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - PILOT_SANDBOX_BROKER_URL=http://host.docker.internal:8787
+      - PILOT_SANDBOX_TOKEN_FILE=/run/pilot-broker-token
+      - HERMES_WRITE_SAFE_ROOT=/workspace
+    # Keep the image's s6 entrypoint for UID mapping and supervised services.
+    command: ["/opt/hermes/.venv/bin/python", "/opt/data/operator/run-gateway-with-boundary.py"]

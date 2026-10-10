@@ -1,0 +1,3 @@
+name: pilot-slack-controls
+version: "0.1"
+description: Claude Tag-style per-thread mute, feedback, and per-channel automatic reply setting

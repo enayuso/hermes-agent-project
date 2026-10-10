@@ -1,0 +1,3 @@
+name: pilot-slack-read
+version: "0.1"
+description: Read-only Slack tools (channel history, threads, pins) with Claude Tag's cross-channel access rule

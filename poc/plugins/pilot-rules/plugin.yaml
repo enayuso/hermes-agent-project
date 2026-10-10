@@ -1,0 +1,3 @@
+name: pilot-rules
+version: "0.1"
+description: Dots-style Allow / Ask / Block rules on every tool call, read from $HERMES_HOME/pilot-rules.yaml
